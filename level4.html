@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Help McCarvil return to H206</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+    <body>
+        <h3>Level 4</h3>
+        <div id="tagline">
+            Mr. McCarvil is lost! Help him return to his precious students!
+        </div>
+
+        <div id="equation">
+            <div id="equation-formula">f(x) = a(x - x<sub>1</sub>)(x - x<sub>2</sub>) ... (x - x<sub>n</sub>)</div>
+            a: <input type="number" step="0.01" placeholder="a" id="a" value="0.1">
+            x: <input type="text" placeholder="x1,x2,x3,x4" id='x' value="0,2,4,6">
+        </div>
+        
+        <div id="game">
+            <div>
+                <div id="graphs">
+                    <div class="graph">
+                        <div class="graph-label">y = f(x)</div>
+                        <canvas id="canvas-curve1d" width="500" height="500"></canvas>
+                    </div>
+                    <div class="graph">
+                        <div class="graph-label">y = f'(x)</div>
+                        <canvas id="canvas-deriv1d" width="500" height="500"></canvas>
+                    </div>
+                </div>
+                <button id="play">Play</button>
+                <button id="stop">Stop</button>
+            </div>
+        </div>
+        <div id="win">
+            You Won! <a style="float:right" href="level5.html" class="button">Next Level >>></a>
+        </div>
+        
+        <script src="bundle.js"></script>
+    </body>
+</html>

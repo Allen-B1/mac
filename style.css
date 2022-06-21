@@ -1,0 +1,61 @@
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+h3 {
+    text-align: center;
+}
+#tagline {
+    text-align: center;
+}
+
+#win {
+    display: none;
+
+    background: hsl(50, 50%, 70%);
+    width: 240px;
+    margin: auto;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+#equation {
+    font-family: serif;
+    text-align: center;
+    padding: 8px;
+    background: hsl(230, 90%, 95%);
+    max-width: 512px;
+    margin: auto;
+    margin-top: 16px;
+}
+#equation-formula {
+    font-size: 20px;
+}
+
+input {
+    border: 0;
+    border-bottom: 2px solid hsl(230, 80%, 50%);
+    background: transparent;
+    padding: 4px 8px;
+}
+
+#graphs {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;    
+}
+
+.graph-label {
+    text-align: center;
+}
+
+#game > div {
+    padding: 8px;
+    background: #eee;
+    margin-top: 16px;
+    display: inline-block;
+}
+#game {
+    text-align: center;
+}
