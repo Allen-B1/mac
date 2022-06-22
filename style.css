@@ -24,7 +24,7 @@ h3 {
     text-align: center;
     padding: 8px;
     background: hsl(230, 90%, 95%);
-    max-width: 512px;
+    max-width: 384px;
     margin: auto;
     margin-top: 16px;
 }
@@ -37,6 +37,9 @@ input {
     border-bottom: 2px solid hsl(230, 80%, 50%);
     background: transparent;
     padding: 4px 8px;
+}
+input[type=number] {
+    width: 64px;
 }
 input:disabled {
     border-bottom: 2px solid #aaa;
