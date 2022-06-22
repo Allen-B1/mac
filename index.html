@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Records</title>
+        <link rel="stylesheet" href="style.css">
+        <style>
+a {
+    font-weight: bold;
+    margin-top: 16px;
+    display: block;
+    text-align: center;
+}
+h1 {
+    text-align: center;
+}
+.eq {
+    font-family: serif;
+    font-weight: bold;
+    font-size: 17px;
+}
+.time {
+    float: right;
+}
+main {
+    max-width: 384px;
+    padding: 16px;
+    margin: auto;
+    padding-top: 32px;
+}
+        </style>
+    </head>
+    <body>
+        <main>
+            <h1>Records</h1>
+            <a href="level1.html">Level 1</a> <div id="stats-1"></div>
+            <a href="level2.html">Level 2</a> <div id="stats-2"></div>
+            <a href="level3.html">Level 3</a> <div id="stats-3"></div>
+            <a href="level4.html">Level 4</a> <div id="stats-4"></div>
+            <a href="level5.html">Level 5</a> <div id="stats-5"></div>
+            <a href="level6.html">Level 6</a> <div id="stats-6"></div>
+            <a href="level7.html">Level 7</a> <div id="stats-7"></div>
+        </main>
+
+
+        <script>
+for (let i = 1; i <= 7; i++) {
+    let e = document.getElementById("stats-" + i);
+    let formulas = (localStorage.getItem("s" + i) || "").split("||");
+    let times = (localStorage.getItem("t" + i) || "").split("||").map(Number);
+    if (formulas[0].length == 0) {
+        e.innerHTML = "N/A";
+        e.style.textAlign = "center";
+        continue; // skip unfilled
+    }
+    for (let j = 0; j < formulas.length ;j++) {
+        e.innerHTML += "<span class=eq> " + (i >= 5 ? "f(x, y) = " : "f(x) = ") + formulas[j] + "</span><span class=time>" + (times[j]/1000) + "s</span><br />";
+    }
+}
+        </script>
+    </body>
+</html>

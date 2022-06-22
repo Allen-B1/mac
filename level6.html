@@ -2,28 +2,26 @@
 <html lang="en">
     <head>
         <title>Help McCarvil return to H206</title>
-        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="style.css" charset="UTF-8">
     </head>
 
     <body>
-        <h3>Level 1</h3>
+        <h3>Level 6</h3>
         <div id="tagline">
             Mr. McCarvil is lost! Help him return to his precious students! <br />
-            Press 'Stop' to enable editing the curve.
+            Warmer colors represent larger numbers, cooler colors represent smaller numbers.
         </div>
 
         <div id="equation">
-            <div id="equation-formula">f(x) = a(x - x<sub>1</sub>)(x - x<sub>2</sub>) ... (x - x<sub>n</sub>)</div>
-            a: <input type="number" step="0.01" placeholder="a" id="a" value="0.1">
-            x: <input type="text" placeholder="x1,x2,x3,x4" id='x' value="0,2,4,6">
+            <div id="equation-formula">f(x, y) = <input type="text" value="x+y" id="formula" placeholder="x+y"></div>
         </div>
         
         <div id="game">
             <div>
                 <div id="graphs">
                     <div class="graph">
-                        <div class="graph-label">y = f(x)</div>
-                        <canvas id="canvas-curve1d" width="500" height="500"></canvas>
+                        <div class="graph-label"><b>x''</b>(t) = -&#x2207;f</div>
+                        <canvas id="canvas-color2d" width="500" height="500"></canvas>
                     </div>
                 </div>
                 <button id="play">Play</button>
@@ -31,7 +29,7 @@
             </div>
         </div>
         <div id="win">
-            You Won! <a style="float:right" href="level2.html" class="button">Next Level >>></a>
+            You won! <a style="float:right" href="level7.html" class="button">Next Level >>></a>
         </div>
         
         <script src="bundle.js" charset="UTF-8"></script>

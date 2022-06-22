@@ -38,6 +38,12 @@ input {
     background: transparent;
     padding: 4px 8px;
 }
+input:disabled {
+    border-bottom: 2px solid #aaa;
+}
+input:invalid, input.invalid {
+    border-bottom: 2px solid hsl(10, 80%, 50%);
+}
 
 #graphs {
     display: flex;

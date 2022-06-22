@@ -1,13 +1,21 @@
 import {Vec, VecInterface} from  "./vector";
+import * as math from 'mathjs';
 
 export interface Func1D {
     evaluate(x: number): number
     toString() : string
 }
 
-export interface Func2D1D {
+export interface Func2D {
     evaluate(x: number, y: number): number
     toString() : string
+}
+
+function gradient(f: Func2D, x: number, y: number): [number, number] {
+    let d = 0.000001;
+    let df_x = f.evaluate(x+d, y) - f.evaluate(x, y);
+    let df_y = f.evaluate(x, y+d) - f.evaluate(x, y);
+    return [df_x/d, df_y/d];
 }
 
 export class Polynomial {
@@ -44,11 +52,46 @@ export class Derivative {
     }
 
     evaluate(x: number) {
-        return (this.func.evaluate(x+0.00001) - this.func.evaluate(x)) / 0.00001;
+        return (this.func.evaluate(x+0.000001) - this.func.evaluate(x)) / 0.000001;
     }
 
     toString() : string {
         return "d/dx[" + this.func.toString() + "]";
+    }
+}
+
+export class Func2DExpr {
+    func: math.EvalFunction
+    _s: string
+    
+    constructor (expr: string) {
+        this.recompile(expr);
+    }
+
+    recompile(expr: string): boolean {
+        try {
+            let f = math.compile(expr);
+            f.evaluate({x:0.01,y:0.01}); //test that it works
+            this.func = f;
+            this._s = expr;    
+            return true;
+        } catch(e) {
+            console.warn("invalid expression: " +expr);
+            console.warn(e);
+            if (!this.func) {
+                this.func = math.compile('x+y');
+                this._s = "x+y";
+            }
+            return false;
+        }
+    }
+
+    evaluate(x: number, y: number) : number {
+        return this.func.evaluate({x, y});
+    }
+
+    toString() : string {
+        return this._s;
     }
 }
 
@@ -157,14 +200,11 @@ export class Axes extends Body {
 }
 
 export class Car extends Body {
-    curve: Curve
-
     vel: number[] = [0, 0]
     r: number = 0.5
 
-    constructor (coord: Coord ,curve: Curve) {
+    constructor (coord: Coord) {
         super(coord);
-        this.curve = curve;
     }
 
     draw(ctx: CanvasRenderingContext2D, scale: Scale) {
@@ -178,7 +218,7 @@ export class Car extends Body {
     }
 
     time: number | null = null
-    step() {
+    step1d(curve: Curve) {
         if (this.time == null) {
             this.time = Date.now();
         }
@@ -188,11 +228,11 @@ export class Car extends Body {
         this.time = nowTime;
 
         // collision detection :)
-        var curve_y = this.curve.func.evaluate(this.coord.x - this.curve.coord.x);
+        var curve_y = curve.func.evaluate(this.coord.x - curve.coord.x);
         var acc = [0, -3];
-        var collision = this.coord.y - this.r - this.curve.coord.y < curve_y && curve_y < this.coord.y + this.r - this.curve.coord.y;
+        var collision = this.coord.y - this.r - curve.coord.y < curve_y && curve_y < this.coord.y + this.r - curve.coord.y;
         if (collision) {
-            var deriv = (this.curve.func.evaluate(this.coord.x - this.curve.coord.x + 0.001) -this.curve.func.evaluate(this.coord.x - this.curve.coord.x)) / 0.001;
+            var deriv = (curve.func.evaluate(this.coord.x - curve.coord.x + 0.001) -curve.func.evaluate(this.coord.x - curve.coord.x)) / 0.001;
             var perp_basis = Vec.unit([1, -1/deriv]);
             var par_basis = Vec.unit([1, deriv]);
 
@@ -201,8 +241,8 @@ export class Car extends Body {
             // only parallel gravity
             let par_grav = Vec.dot(par_basis, acc);
             acc = Vec.mul(par_grav, par_basis);
-            if (this.coord.y - this.r - this.curve.coord.y  < curve_y) {
-                this.coord.y = curve_y + this.curve.coord.y + this.r; // move thing above
+            if (this.coord.y - this.r - curve.coord.y  < curve_y) {
+                this.coord.y = curve_y + curve.coord.y + this.r; // move thing above
                 
                 // erase perpendicular velocitys
                 var par_vel = Vec.dot(par_basis, this.vel);
@@ -210,6 +250,21 @@ export class Car extends Body {
             }
         }
 
+        this.vel = Vec.add(this.vel, Vec.mul(dtSec, acc));
+        this.coord.x += dtSec * this.vel[0];
+        this.coord.y += dtSec * this.vel[1];
+    }
+
+    step2d(plot: ColorPlot) {
+        if (this.time == null) {
+            this.time = Date.now();
+        }
+        var nowTime = Date.now();
+        var dtSec = (nowTime - this.time) / 1000;
+        this.time = nowTime;
+
+        let acc = Vec.mul(-1, gradient(plot.func, this.coord.x - plot.coord.x, this.coord.y - plot.coord.y));
+        
         this.vel = Vec.add(this.vel, Vec.mul(dtSec, acc));
         this.coord.x += dtSec * this.vel[0];
         this.coord.y += dtSec * this.vel[1];
@@ -265,6 +320,33 @@ export class Office extends Body {
         ctx.fillStyle = "white";
         ctx.font = '14px sans-serif';
         ctx.fillText(this.text, scale.transformedToRaw(this.coord).xraw - scale.transformedToRawXSize(1), scale.transformedToRaw(this.coord).yraw + scale.transformedToRawYSize(0.2));
+    }
+}
+
+export class ColorPlot extends Body {
+    func: Func2D
+    xrange:  [number, number]
+    yrange: [number, number]
+    d: number = 0.25
+
+    constructor(func: Func2D, xrange: [number, number], yrange: [number, number]) {
+        super(new Coord([0, 0]));
+        this.func = func;
+        this.xrange = xrange;
+        this.yrange = yrange;
+    }
+
+    draw(ctx: CanvasRenderingContext2D, scale: Scale) {
+        for (let x = this.xrange[0]; x <= this.xrange[1]; x += this.d) {
+            for (let y = this.yrange[0]; y <= this.yrange[1]; y += this.d) {
+                let res = this.func.evaluate(x, y);
+                let hue = ((-math.tanh(res/50) + 1) / 2) * 280;
+                ctx.fillStyle = 'hsl(' + hue + ',90%,60%)';
+                let raw = scale.transformedToRaw(new Coord(Vec.add(this.coord, [x, y])));
+                ctx.fillRect(raw.xraw, raw.yraw, scale.transformedToRawXSize(this.d), scale.transformedToRawYSize(this.d));
+            }
+        }
+        console.log("redrawn!");
     }
 }
 
